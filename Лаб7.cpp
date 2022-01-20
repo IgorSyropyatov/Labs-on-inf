@@ -1,109 +1,117 @@
+#include  "locale.h"
+
+#include <cmath>
 #include <iostream>
-#include <math.h>
 
 using namespace std;
 
-
-void printFIO(const char* last_name = "Sidorov", const char* first_name = "Egor", const char* patronymic = "Andreevich")
-{
-	cout << last_name << " " << first_name << " " << patronymic << endl;
-	return;
+void FIOprint(string firstName, string lastName = "РРјСЏ", string patronymic = "РћС‚С‡РµСЃС‚РІРѕ") {
+	string result = firstName + " ";
+	if (lastName != "РРјСЏ") {
+		result += lastName + " ";
+	}
+	if (patronymic != "РћС‚С‡РµСЃС‚РІРѕ") {
+		result += patronymic + " ";
+	}
+	cout << result + "\n";
 }
-int getMin(int n, ...)
-{
+
+
+void minFromParams(unsigned char number, int n, ...) {
+	int min = INT_MAX;
+	int num;
 	int* p = &n;
-	p++;
-	int num = *(p++);
-	int min = num;
-	for (; n > 1; n--)
-	{
-		num = *(p++);
-		if (min > num)
-			min = num;
+
+	while (number--) {
+		if (*(p) < min)
+		{
+			min = *(p);
+		}
+		p++;
 	}
-	return min;
+	cout << "РњРёРЅРёРјР°Р»СЊРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ СЂР°РІРµРЅ: " << min << "\n";
 }
-double getAVG(int mas[], int n)
-{
-	double s = 0;
-	for (int i = 0; i < n; i++)
-		s += mas[i];
-	return s / n;
-}
-double getAVG(double mas[], int n)
-{
-	double s = 0;
-	for (int i = 0; i < n; i++)
-		s += mas[i];
-	return s / n;
-}
+double avgArrey(int mass[10]) {
 
-double getAVG(char mas[], int n)
-{
-	double s = 0;
-	for (int i = 0; i < n; i++)
-		s += mas[i];
-	return s / n;
-}
-template<class T>
-double getMasAVG(T mas[], int n)
-{
-	double s = 0;
-	for (int i = 0; i < n; i++)
-		s += mas[i];
-	return s / n;
-}
-typedef double(*fptr)(double);
-double root(fptr f, double a, double b, double lambda, double eps)
-{
-	double x = (a + b) / 2;
-	while (fabs((*f)(x)) > eps)
-	{
-		x = x + lambda * (*f)(x);
+	int sum = 0;
+	for (int i = 0; i < 10; i++) {
+		sum += mass[i];
 	}
-	return x;
+	return ((double)sum) / 10;
 }
-double testf(double x)
+double avgArrey(double mass[10])
 {
-	return 3 * sin(sqrt(x)) + 0.35 * x - 3.8;
+
+	double sum = 0;
+	for (int i = 0; i < 10; i++) {
+		sum += mass[i];
+
+		return ((double)sum) / 10;
+	}
 }
 
-
-int main()
+double avgArrey(char mass[10])
 {
-	setlocale(LC_ALL, "");
-	cout << "Использование функции с умалчиваемыми параметрами" << endl;
+	char sum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		sum += mass[i];
+	}
+	return ((double)sum) / 10;
+}
 
-	printFIO("Sidorov", "Pavel", "Aleksandrovich");
+template <typename T>
+double avgTArrey(T mass[10]) {
 
-	printFIO();
+	T sum = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		sum += mass[i];
+	}
 
-	printFIO("Petrov", "Sergey");
+	return ((double)sum) / 10;
+}
+double func(double x) {
+	return (-3.0 * sin(sqrt(x)) + 3.8) / 0.35;
+}
 
-	cout << "\nИспользование функции с переменным числом параметров" << endl;
+double calc(double (*f)(double), double a = 2, double b = 3, double e = 0.0001) {
+	double x0 = a,
+		x1 = b;
+	while (true)
+	{
+		x1 = f(x0);
+		if (fabs(x1 - x0) < e) break;
+		x0 = x1;
+	}
+	return x1;
+}
 
-	cout << "Минимальный элемент в списке [2, 1, 5]: " << getMin(3, 2, 1, 5) << endl;
-
-	cout << "Минимальный элемент в списке [4, 6, 2, 8, 9, 5, 3, -4, -6, 12]: " << getMin(10, 4, 6, 2, 8, 9, 5, 3, -4, -6, 12) << endl;
-
-	cout << "\nИспользование перегруженных функции" << endl;
-	int mas1[] = { 1, 2, 5, 3, 2 };
-	double mas2[] = { 2.8, 3.6, 4.1, 13.2, 16.4, 9.3 };
-	char mas3[] = { 'a', 'b', 'c', 'd' };
-	cout << "Среднее арифметическое среди элементов массива [1, 2, 5, 3, 2]: " << getAVG(mas1, 5) << endl;
-	cout << "Среднее арифметическое среди элементов массива [2.8, 3.6, 4.1, 13.2, 16.4, 9.3]: " << getAVG(mas2, 6) << endl;
-	cout << "Среднее арифметическое среди элементов массива ['a', 'b', 'c', 'd']: " << getAVG(mas3, 4) << endl;
-
-
-	cout << "\nИспользование шаблона функции" << endl;
-	cout << "Среднее арифметическое среди элементов массива [1, 2, 5, 3, 2]: " << getMasAVG(mas1, 5) << endl;
-	cout << "Среднее арифметическое среди элементов массива [2.8, 3.6, 4.1, 13.2, 16.4, 9.3]: " << getMasAVG(mas2, 6) << endl;
-	cout << "Среднее арифметическое среди элементов массива ['a', 'b', 'c', 'd']: " << getMasAVG(mas3, 4) << endl;
-
-
-	fptr f = testf;
-	cout << "\nНахождение корня уравнения 3*sin(sqrt(x))+0.35*x-3.8 = 0 методом итераций на отрезке [2;3]: ";
-	cout << root(f, 2, 3, -2, 0.000001) << endl;
-	cout << "Точное значение корня уравнения 3*sin(sqrt(x))+0.35*x-3.8 = 0 на отрезке [2;3]: 2.2985";
+int main() {
+	setlocale(LC_ALL, "Rus");
+	FIOprint("РЎС‹СЂРѕРїСЏС‚РѕРІ", "РРіРѕСЂСЊ", "РђРЅРґСЂРµРµРІРёС‡");
+	FIOprint("РЎС‹СЂРѕРїСЏС‚РѕРІ");
+	FIOprint("РЎС‹СЂРѕРїСЏС‚РѕРІ", "РРіРѕСЂСЊ");
+	minFromParams(3, 2, -51, 5);
+	minFromParams(2, 35, 0);
+	minFromParams(1, 56);
+	double avg;
+	int mass1[10] = { 1,2,3,4,5,6,7,8,9,10 };
+	double mass2[10] = { 1.562,834.23,672.26,322.623, 6236.623,2.3,55.622, 9923,25.523552355 };
+	char mass3[10] = { 'f','s','h','F','q','G','РІ','2','9',';' };
+	avg = avgArrey(mass1);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° int: " << avg << "\n";
+	avg = avgArrey(mass2);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° double: " << avg << "\n";
+	avg = avgArrey(mass3);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° char: " << avg << "\n";
+	avg = avgTArrey(mass1);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° int: " << avg << "\n";
+	avg = avgTArrey(mass2);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° double: " << avg << "\n";
+	avg = avgTArrey(mass3);
+	cout << "РЎСЂРµРґРЅРµРµ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРѕРµ РјР°СЃСЃРёРІР° char: " << avg << "\n";
+	cout << "Р—РЅР°С‡РµРЅРёРµ x = " << calc(&func);
+	cout << "РСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ: 2.2985";
 	return 0;
 }
