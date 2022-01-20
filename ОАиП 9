@@ -1,0 +1,183 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
+
+//Вариант 1
+struct Enrollee //структура ученика
+{
+    string FIO;//ФИО
+    string birfDay;//дата рождения
+    int marks[3];//оценки
+    double avg;//средняя оценку
+};
+
+void del_num(const char* filename, int k)
+{
+    fstream temp("temp", ios::out);
+    fstream f(filename, ios::in);
+    Enrollee a;
+    int id = 1;
+    do {
+        f >> a.FIO;
+        f >> a.birfDay;
+        f >> a.marks[0];
+        f >> a.marks[1];
+        f >> a.marks[2];
+        f >> a.avg;
+        if (f.eof())break;
+        if (id != k)
+        {
+            temp << a.FIO; temp << "\n";
+            temp << a.birfDay; temp << "\n";
+            temp << a.marks[0]; temp << "\n";
+            temp << a.marks[1]; temp << "\n";
+            temp << a.marks[2]; temp << "\n";
+            temp << a.avg; temp << "\n";
+        }
+        id++;
+    } while (!f.eof());
+    f.close();
+    temp.close(); 
+    remove(filename);
+    rename("temp", filename);
+}
+
+void add_in_beginning(const char* filename, struct Enrollee* mas, int n)
+{
+    fstream temp("temp", ios::out);
+    fstream f(filename, ios::in);
+    Enrollee a;
+        
+    for (int i = 0; i < n; i++)
+    {
+        
+        temp << mas[i].FIO; temp << "\n";
+        temp << mas[i].birfDay; temp << "\n";
+        temp << mas[i].marks[0]; temp << "\n";
+        temp << mas[i].marks[1]; temp << "\n";
+        temp << mas[i].marks[2]; temp << "\n";
+        temp << mas[i].avg; temp << "\n";
+    }
+    do {
+        
+        f >> a.FIO;
+        f >> a.birfDay;
+        f >> a.marks[0];
+        f >> a.marks[1];
+        f >> a.marks[2];
+        f >> a.avg;
+        if (f.eof())break;
+        
+        temp << a.FIO; temp << "\n";
+        temp << a.birfDay; temp << "\n";
+        temp << a.marks[0]; temp << "\n";
+        temp << a.marks[1]; temp << "\n";
+        temp << a.marks[2]; temp << "\n";
+        temp << a.avg; temp << "\n";
+    } while (!f.eof());
+    f.close();
+    temp.close(); 
+    remove(filename);
+    rename("temp", filename);
+}
+
+void save(const char* filename, struct Enrollee* mas, int n)
+{
+    fstream f(filename, ios::out);
+    for (int i = 0; i < n; i++)
+    {
+        
+        f << mas[i].FIO; f << "\n";
+        f << mas[i].birfDay; f << "\n";
+        f << mas[i].marks[0]; f << "\n";
+        f << mas[i].marks[1]; f << "\n";
+        f << mas[i].marks[2]; f << "\n";
+        f << mas[i].avg; f << "\n";
+    }
+
+    f.close();
+}
+
+
+void load(const char* filename)
+{
+    fstream f;
+    Enrollee p;
+    f.open(filename, ios::in);
+    int id = 1;
+    do
+    {
+        
+        f >> p.FIO;
+        f >> p.birfDay;
+        f >> p.marks[0];
+        f >> p.marks[1];
+        f >> p.marks[2];
+        f >> p.avg;
+        if (f.eof())break;
+        
+        cout << id << " " << p.FIO << " " << p.birfDay << " " << p.marks[0] << " " << p.marks[1] << " " << p.marks[2] << " " << p.avg << "\n";
+        id++;
+    } while (!f.eof());
+
+    f.close();
+}
+
+
+int main(void)
+{
+    setlocale(LC_ALL, "Rus");
+    const char* filename = "studens.stud";
+    Enrollee* mas;
+    int n;
+    while (true) {
+        cout << "Введите кол-во данных:";
+        cin >> n;
+        mas = new Enrollee[n];
+        for (int i = 0; i < n; i++)
+        {
+            cout << "ФИО: ";
+            
+            cin >> mas[i].FIO;
+            cout << "Дата рождения: ";
+            cin >> mas[i].birfDay;
+            cout << "Оценка по предмету 1: ";
+            cin >> mas[i].marks[0];
+            cout << "Оценка по предмету 2: ";
+            cin >> mas[i].marks[1];
+            cout << "Оценка по предмету 3: ";
+            cin >> mas[i].marks[2];
+            mas[i].avg = (mas[i].marks[0] + mas[i].marks[1] + mas[i].marks[2]) / 3;
+        }
+        save(filename, mas, n);
+        load(filename);
+
+        cout << "Удалить из файла студента под номером k =";
+        cin >> n;
+        del_num(filename, n);
+        cout << "Введите кол-во добавляемых в файл данных: ";
+        cin >> n;
+        mas = new Enrollee[n];
+        for (int i = 0; i < n; i++)
+        {
+            cout << "ФИО: ";
+            
+            cin >> mas[i].FIO;
+            cout << "Дата рождения: ";
+            cin >> mas[i].birfDay;
+            cout << "Оценка по предмету 1: ";
+            cin >> mas[i].marks[0];
+            cout << "Оценка по предмету 2: ";
+            cin >> mas[i].marks[1];
+            cout << "Оценка по предмету 3: ";
+            cin >> mas[i].marks[2];
+            mas[i].avg = (mas[i].marks[0] + mas[i].marks[1] + mas[i].marks[2]) / 3;
+        }
+        add_in_beginning(filename, mas, n);
+        load(filename);
+    }
+    return 0;
+}
