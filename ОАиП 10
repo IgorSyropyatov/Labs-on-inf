@@ -1,379 +1,88 @@
 #include <iostream>
-#include <conio.h>
-#include <fstream>
 using namespace std;
+//Написать программу, в которой создаются динамические массивы и  
+//выполнить их обработку всоответствии со своим вариантом. 
+//3. Порядок выполнения работы
+//1. Ввести размер массива;
+//2.Сформировать массив с помощью операции new или библиотечных функций malloc(calloc);
+//3.Заполнить массив(можно с помощью датчика случайных чисел);
+//4.Выполнить задание варианта, сформировать новый массив(ы) - результат(ы);
+//5.Напечатать массив(ы) - результат(ы);
+//6.Удалить динамические массивы с помощью операции delete или библиотечной функции free.
 
-struct Temperature {
-    int day;//день
-    int avgD;//средняя температура за день
-};
-const char* cureFileName;
-const char* realFileName = "dataBase.bd";
-int cureMassLen = 0;
-
-void save(const char* filename, struct Temperature* mas, int n)
-{
-    fstream f(filename, ios::out);
-    for (int i = 0; i < cureMassLen; i++)
-    {
-        
-        f << mas[i].day; f << "\n";
-        f << mas[i].avgD; f << "\n";
-    }
-    f.close();
-}
-
-
-Temperature* change_elem(Temperature* b, int day, int avgT)
-{
-    for (int i = 0; i < cureMassLen; i++)
-    {
-        if (b[i].day == day)
-        {
-            b[i].avgD = avgT;
-        }
-    }
-    save(cureFileName, b, cureMassLen);
-    return b;
-}
-
-Temperature* add_elem(const char* filename, Temperature* b, int day, int avgT, int n)
-{
-    int i = 0;
-    Temperature* a = new Temperature[cureMassLen + 1];
-    for (; i < cureMassLen + 1; i++)
-    {
-        if (i == n)        
-        {
-            a[i].day = day;
-            a[i].avgD = avgT;
-        }
-        else if (i < n) {
-            a[i].day = b[i].day;
-            a[i].avgD = b[i].avgD;
-        }
-        else 
-        {
-            a[i].day = b[i - 1].day;
-            a[i].avgD = b[i - 1].avgD;
-        }
-    }
-    cureMassLen++;
-    save(cureFileName, a, cureMassLen);
-    return a;
-}
-
-void days_where_more_than_middel(Temperature* b)
-{
-    int sum = 0;
-    for (int i = 0; i < cureMassLen; i++)
-    {
-        sum += b[i].avgD;
-    }
-    double avgM = ((double)sum) / ((double)cureMassLen);
-    cout << "Средняя температура: " << avgM;
-    cout << "\nДень\tТемпература\n";
-    for (int i = 0; i < cureMassLen; i++)
-    {
-        if (b[i].avgD > avgM) {
-            cout << b[i].day << "\t" << b[i].avgD << "\n";
-        }
-    }
-}
-
-//вычисляем наибольший промежуток времени с отрицательной температурой
-void cold(Temperature* b) {
-    int countMax = 0;//счётчик
-    int tmp = 0;//функция для сохранения
-    int id = -1;//id
-    for (int i = 0; i < cureMassLen - 1; i++)
-    {
-        if (b[i].avgD < 0 && b[i + 1].avgD < 0) 
-        {
-            countMax++;
-            if (i == cureMassLen - 2)  
-            {
-                if (countMax > tmp)
-                {
-                    id = i + 1;
-                    tmp = countMax;
-                }
-            }
-        }
-        else if (b[i].avgD < 0 && b[i + 1].avgD >= 0) 
-        {
-            if (countMax > tmp) {
-                
-                tmp = countMax;
-                id = i;
-
-
-            }
-            countMax = 0;
-        }
-    }
-    if (id >= 0) 
-    {
-        cout << "\nДень\tТемпература\n";
-        for (int i = id - tmp; i <= id; i++) {
-            cout << b[i].day << "\t" << b[i].avgD << "\n";
-        }
-    }
-    else {
-        cout << "\nВсе дни с положительной температурой\n";
-    }
-
-}
-
-
-Temperature* del_num(const char* filename, Temperature* b, int k, int n)
-{
-    fstream f(filename, ios::out);
-        
-    int i = 0;
-    if (cureMassLen > 0) {
-        Temperature* a = new Temperature[cureMassLen - 1];
-        for (; i < cureMassLen; i++)
-        {
-            if (i != k)
-            {
-                f << b[i].day; f << "\n";
-                f << b[i].avgD; f << "\n";
-                a[i].day = b[i].day;
-                a[i].avgD = b[i].avgD;
-            }
-        }
-        f.close();
-        cureMassLen--;
-        if (n >= cureMassLen * 2)
-        {
-            remove(realFileName);
-            rename(filename, realFileName);
-        }
-        return a;
-    }
-    return new Temperature[0];
-}
-
-Temperature* del_key(const char* filename, Temperature* b, int k, int n)
-{
-    fstream f(filename, ios::out);
-        
-    int i = 0;
-    Temperature* a = new Temperature[cureMassLen - 1];
-    for (int j = 0; i < cureMassLen - 1; i++, j++)
-    {
-        if (b[i].day == k)
-        {
-            j++;  
-        }
-        f << b[j].day; f << "\n";
-        f << b[j].avgD; f << "\n";
-        a[i].day = b[j].day;
-        a[i].avgD = b[j].avgD;
-    }
-    f.close();
-    cureMassLen--;
-    if (n >= cureMassLen * 2) {
-        remove(realFileName);
-        rename(filename, realFileName);
-    }
-    return a;
-}
-
-// загрузка из файла массива структур
-Temperature* load(const char* filename)
-{
-
-    fstream f;
-    Temperature a;
-    Temperature* p;
-    f.open(filename, ios::in);
-    if (f) 
-    {
-        int num = 0;
-        do
-        {
-            
-            f >> a.day;
-            f >> a.avgD;
-            if (f.eof())break;
-            num++;
-        } while (!f.eof());
-
-        f.close();
-        f.open(filename, ios::in);
-        p = new Temperature[num];
-        if (num > 0) {
-            num = 0;
-            do
-            {
-                
-                f >> a.day;
-                f >> a.avgD;
-                if (f.eof())break;
-                p[num] = a;
-                num++;
-            } while (!f.eof());
-        }
-        cureMassLen = num;
-        f.close();
-        return p;
-    }
-    return new Temperature[0];
-}
-
-Temperature* create(int n = 30) {
-    Temperature* p = new Temperature[n];
-    for (int i = 0; i < n; i++) {
-        cout << "Введите среднюю температур в " << i + 1 << " день: ";
-        cin >> p[i].avgD;
-        p[i].day = i + 1;
-    }
-    return p;
-}
-//вывод массива
-void show(Temperature* dataBase, int n) {
-    cout << "\nДень\tТемпература\n";
-    for (int i = 0; i < n; i++) {
-        cout << dataBase[i].day << "\t" << dataBase[i].avgD << "\n";
-    }
-}
+//Вариант 1.	
+//Сформировать одномерный массив Удалить из него элемент с заданным номером, добавить элемент с заданным номером;
 int main()
 {
-    Temperature* mas = load(realFileName);
-    if (cureMassLen == 0)
-        mas = new Temperature[0];
-    int n = 0;
-    setlocale(LC_ALL, "Rus");
-    while (1) {
-        cout << "1 - Создать БД, 2 - Показать базу данных, 3 - Удалить элемент, 4 - Добавить элемент, 5 - изменить элемент, 6 - вывести дни в которых температура выше средней, 7 - Вывести самый длинный отрезок времени с отрицательной температурой, 8 - Отменить удаления, 9 - Сохранить изменения";
-        cout << "\n";
-        char c = _getch();
-        int tmp, day, id;
-        switch (c) {
-        case '1':
-            
-            cout << "Введите размер массива: ";
-            cin >> cureMassLen;
-            mas = create(cureMassLen);
-            n = cureMassLen;
-            cureFileName = realFileName;
-            save(cureFileName, mas, n);
-            break;
-        case '2':
-            
-            if (cureMassLen != 0) {
-                cout << "\n";
-                show(mas, cureMassLen);
-            }
-            else {
-                cout << "Нет данных ";
-            }
-            break;
-        case '3':
-            
-            if (cureMassLen != 0) {
-                cout << "1 - Удалить по ключу, 2 - Удалить по номеру ";
-                cout << "\n";
-                char c = _getch();
-                switch (c)
-                {
-                case '1':
-                    //по ключу
-                    cout << "Введите день: ";
-                    int day;
-                    cin >> day;
-                    cureFileName = "temp";
-                    mas = del_key(cureFileName, mas, day, n);
-                    cout << "\n";
-                    break;
-                case '2':
-                    //по номеру
-                    cout << "Введите ID: ";
-                    int num;
-                    cin >> num;
-                    cureFileName = "temp";
-                    mas = del_num(cureFileName, mas, num, n);
-                    cout << "\n";
-                    break;
-                default:
-                    break;
-                }
-            }
-            else {
-                cout << "Нет данных ";
-            } break;
-        case '4':
-            
-            cout << "1 - Добавить в начало, 2 - Добавить после номера, 3 - Добавить в конец списка ";
-            c = _getch();
-            switch (c)
-
-            {
-
-            case '1':
-                
-                cout << "Введите день: ";
-                cin >> day;
-                cout << "Введите температуру: ";
-                cin >> tmp;
-                mas = add_elem(cureFileName, mas, day, tmp, 0);
-                break;
-            case '2':
-                
-                cout << "Введите на какое место добавить: ";
-                cin >> id;
-                cout << "Введите день: ";
-                cin >> day;
-                cout << "Введите температуру: ";
-                cin >> tmp;
-                mas = add_elem(cureFileName, mas, day, tmp, id);
-                break;
-            case '3':
-                
-                cout << "Введите день: ";
-                cin >> day;
-                cout << "Введите температуру: ";
-                cin >> tmp;
-                mas = add_elem(cureFileName, mas, day, tmp, cureMassLen - 1);
-                break;
-            default:
-                break;
-            }
-            break;
-        case '5':
-            
-            cout << "Введите день, температуру которого нужно изменить: ";
-            cin >> day;
-            cout << "Введите температуру: ";
-            cin >> tmp;
-            mas = change_elem(mas, day, tmp);
-            break;
-        case '6':
-            
-            days_where_more_than_middel(mas);
-            break;
-        case '7':
-            
-            cold(mas);
-            break;
-        case '8':
-            
-            mas = load(realFileName);
-            cureFileName = realFileName;
-            break;
-        case '9':
-            
-            save(cureFileName, mas, cureMassLen);
-            if (cureFileName != realFileName) {
-                remove(realFileName);
-                rename(cureFileName, realFileName);
-                cureFileName = realFileName;
-            }
-            break;
-        case 27:
-            return 1;
-        }
+    setlocale(LC_ALL, "Rus");//меняем язык консоли на русский
+    int n;
+    cout << "Введите размер массива:"; cin >> n; cout << "\n";
+    int* mass = new int[n];//создаем динамический массив
+    //заполняем его
+    for (int i = 0; i < n; i++) 
+    {
+        mass[i] = rand();
     }
+    //выводим на экран
+    for (int i = 0; i < n; i++) {
+        cout << mass[i] << " ";
+    }
+    cout << "\n";
+    //создаем вспомогательный динамический массив в который будут записаны все элементы массива mass кроме k-того и уменьшаем n
+    int* temp = new int[--n];
+    int k = 0;
+    cout << "Введите индекс удаляемого элемента:"; cin >> k; cout << "\n";
+    //если k выходим за рамки от 0 до n, k присваиваем ближайший предел
+    if (k >= n) {
+        k = n - 1;
+    }
+    else if (k < 0) {
+        k = 0;
+    }
+    //в temp переписываем все значения кроме k-того
+    for (int i = 0; i < n; i++)
+    {
+        if (k > i)
+            temp[i] = mass[i];
+        else
+            temp[i] = mass[i+1];
+    }
+   
+    mass = temp;//передаем в mass temp
+    //выводим mass на экран 
+    for (int i = 0; i < n; i++) {
+        cout << mass[i] << " ";
+    }
+    cout << "\n";
+    temp = new int[++n];//изменяем размер массива temp для добавления элемента
+    k = 0;
+    cout << "Введите индекс элемента перед которым вставить элемента:"; cin >> k; cout << "\n";
+    //если k выходим за рамки от 0 до n, k присваиваем ближайший предел
+    if (k >= n) {
+        k = n - 1;
+    }
+    else if (k < 0) {
+        k = 0;
+    }
+    //в temp переписываем все значения до k-того после вставляем k-тый
+    // элемент когда i станет равен k и затем переписываем в temp значения mass с уменьшенным на 1 индексом
+    for (int i = 0; i < n; i++)
+    {
+        if (k > i)
+            temp[i] = mass[i];
+        else if (k == i)
+            temp[i] = rand();
+        else
+            temp[i] = mass[i - 1];
+    }
+
+    mass = temp;
+    //выводим mass на экран 
+    for (int i = 0; i < n; i++) {
+        cout << mass[i] << " ";
+    }
+    cout << "\n";
+    delete mass;//удаляем mass из памяти
+    delete temp;//удаляем temp из памяти
+
 }
